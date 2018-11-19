@@ -66,21 +66,6 @@ def generate_filename():
 @app.route("/", methods=["GET", "POST"])
 def capture_image():
 
-    # PRODUCTION ENVIRONMENT
-    if PROD_MODE == True:
-        if request.method == "POST":
-            filename = generate_filename()
-            #camera.resolution = (1280, 720)
-            #camera.crop =  (0.25, 0.4, 1, 2)
-            camera.capture("static/"+filename)
-            num_blob = count_blob("static/"+filename)
-            fft_data = img2frq("static"+filename)
-            fft_data = (index, fft_data)
-            return render_template('prod.html', filename=filename, num_blob=num_blob, fft_data=fft_data)
-        return render_template("prod.html")
-
-
-    # DEVELOPMENT ENVIRONMENT
     if PROD_MODE == False:
         if request.method == "POST":
             image = request.files['file']
@@ -89,9 +74,11 @@ def capture_image():
                filepath = "static/"+image.filename
                num_blob = count_blob(filepath)
                histogram = Image.open(filepath).histogram()
-               minx, maxx, std, mean = np.min(histogram), np.max(histogram), np.std(histogram), np.mean(histogram)
+               fft = img2frq(filepath)
+               minx, maxx, std, mean = np.min(fft), np.max(fft), np.std(fft), np.mean(fft)
+               data = [[fft[i], i] for i in range(len(fft))]
                return render_template('dev.html', filename=image.filename, num_blob=num_blob, 
-					histogram=histogram, minx=minx, maxx=maxx, std=std, mean=mean)
+					histogram=histogram, minx=minx, maxx=maxx, std=std, mean=mean, data=data)
 	
         return render_template("dev.html")
 
