@@ -18,14 +18,6 @@ PROD_MODE = False
 DEBUG = True
 UPLOAD_FOLDER = "static/"
 
-
-if os.uname()[-1] == PROD_MACHINE:
-    from PIL import Image
-    from picamera import PiCamera
-    camera = PiCamera(sensor_mode=5)
-    PROD_MODE = True
-    DEBUG = False
-
 # scikit image reader
 reader = misc.imread
 
